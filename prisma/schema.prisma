@@ -1,0 +1,378 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Portal role stored for a Clerk user. This is not taken from customer forms.
+enum UserRole {
+  SUPER_ADMIN
+  OPERATIONS_MANAGER
+  SALES_OFFICER
+  WAREHOUSE_OFFICER
+  WHOLESALE_CUSTOMER
+}
+
+enum ProductCategory {
+  HBM_CEMENT
+  DANGOTE_CEMENT
+  BLOCKS
+  AGGREGATES
+  OTHER
+}
+
+/// Shared quantity unit. Prices are always per one of these units.
+enum UnitOfMeasure {
+  BAG
+  PIECE
+  LOAD
+  TONNE
+}
+
+enum CustomerType {
+  CONTRACTOR
+  RETAILER
+  DEVELOPER
+  WHOLESALE
+}
+
+enum CustomerStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  PICKING
+  READY
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+}
+
+enum MovementType {
+  RECEIPT
+  ISSUE
+  ADJUSTMENT
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+enum EnquiryKind {
+  QUOTE
+  ACCOUNT
+  CONTACT
+}
+
+enum EnquiryStatus {
+  NEW
+  REVIEWING
+  REPLIED
+  CLOSED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  STATUS_CHANGE
+}
+
+model UserProfile {
+  id           String   @id @default(cuid())
+  clerkUserId  String   @unique
+  name         String
+  email        String
+  role         UserRole
+  active       Boolean  @default(true)
+  /// Buyer account for a wholesale portal user. Staff profiles leave this empty.
+  customerId   String?  @unique
+  isDemo       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  orders         Order[]
+  stockMovements StockMovement[]
+  auditLogs      AuditLog[]
+
+  @@index([role, active])
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  address   String
+  active    Boolean  @default(true)
+  isDemo    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  warehouses Warehouse[]
+  orders     Order[]
+  quotes     Quote[]
+}
+
+model Warehouse {
+  id        String   @id @default(cuid())
+  name      String
+  location  String
+  branchId  String
+  isDemo    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch     Branch          @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  inventory  Inventory[]
+  movements  StockMovement[]
+
+  @@unique([branchId, name])
+  @@index([branchId])
+}
+
+model Product {
+  id            String          @id @default(cuid())
+  name          String
+  sku           String          @unique
+  slug          String          @unique
+  category      ProductCategory
+  brand         String
+  description   String
+  imageUrl      String
+  unit          UnitOfMeasure
+  /// Current catalogue price in currencyCode. Order and quote lines keep their own prices.
+  sellingPrice  Decimal         @db.Decimal(14, 2)
+  currencyCode  String          @default("NGN") @db.Char(3)
+  active        Boolean         @default(true)
+  isDemo        Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  inventory Inventory[]
+  quoteItems QuoteItem[]
+  orderItems OrderItem[]
+  movements  StockMovement[]
+  enquiryItems EnquiryItem[]
+
+  @@index([category, active])
+}
+
+model Inventory {
+  id           String   @id @default(cuid())
+  productId    String
+  warehouseId  String
+  quantityOnHand Decimal @db.Decimal(14, 3)
+  reorderLevel Decimal  @default(0) @db.Decimal(14, 3)
+  isDemo       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+
+  /// On-hand quantity only. Reserved and available quantities are not modelled.
+  @@unique([productId, warehouseId])
+  @@index([warehouseId])
+}
+
+model Customer {
+  id            String         @id @default(cuid())
+  businessName  String
+  contactPerson String
+  email         String         @unique
+  phone         String
+  address       String
+  /// Buyer classification only. It does not grant portal access.
+  customerType  CustomerType
+  status        CustomerStatus @default(PENDING)
+  isDemo        Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  quotes Quote[]
+  orders Order[]
+  portalUsers UserProfile[]
+
+  @@index([status, customerType])
+}
+
+model Quote {
+  id           String      @id @default(cuid())
+  quoteNumber  String      @unique
+  customerId   String
+  status       QuoteStatus @default(DRAFT)
+  expiryDate   DateTime
+  subtotal     Decimal     @db.Decimal(14, 2)
+  currencyCode String      @default("NGN") @db.Char(3)
+  notes        String      @default("")
+  branchId     String
+  isDemo       Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  customer Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  branch   Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  items    QuoteItem[]
+  order    Order?
+
+  @@index([customerId, status])
+  @@index([status, expiryDate])
+  @@index([branchId, createdAt])
+}
+
+model QuoteItem {
+  id        String  @id @default(cuid())
+  quoteId   String
+  productId String
+  quantity  Decimal @db.Decimal(14, 3)
+  /// Price captured for this quotation. Later catalogue changes do not rewrite it.
+  unitPrice Decimal @db.Decimal(14, 2)
+  lineTotal Decimal @db.Decimal(14, 2)
+
+  quote   Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([quoteId])
+  @@index([productId])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderNumber  String      @unique
+  customerId   String
+  status       OrderStatus @default(DRAFT)
+  orderDate    DateTime
+  subtotal     Decimal     @db.Decimal(14, 2)
+  currencyCode String      @default("NGN") @db.Char(3)
+  notes              String      @default("")
+  /// Required when status is CANCELLED. Empty for every other status.
+  cancellationReason String      @default("")
+  createdById        String
+  branchId           String
+  /// Set when the order was raised from an accepted quotation. Prices are copied from that quote.
+  quoteId            String?     @unique
+  isDemo             Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  customer  Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  createdBy UserProfile @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  branch    Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  quote     Quote?      @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  items     OrderItem[]
+
+  @@index([customerId, status])
+  @@index([status, orderDate])
+  @@index([createdById])
+  @@index([branchId, orderDate])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Decimal @db.Decimal(14, 3)
+  /// Price captured when the line was recorded. Catalogue price changes do not rewrite it.
+  unitPrice Decimal @db.Decimal(14, 2)
+  lineTotal Decimal @db.Decimal(14, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model StockMovement {
+  id          String       @id @default(cuid())
+  productId   String
+  warehouseId String
+  type        MovementType
+  quantity    Decimal      @db.Decimal(14, 3)
+  reference   String
+  /// Why the movement was recorded. Order creation does not write a movement.
+  reason      String       @default("")
+  createdById String
+  isDemo      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  warehouse Warehouse   @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  createdBy UserProfile @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([productId, warehouseId, createdAt])
+  @@index([reference])
+  @@index([createdById])
+}
+
+model Enquiry {
+  id            String        @id @default(cuid())
+  kind          EnquiryKind
+  status        EnquiryStatus @default(NEW)
+  customerName  String
+  businessName  String
+  phone         String
+  email         String
+  location      String
+  /// Free-text product request from the public form, kept when no catalogue row matches.
+  productSlug   String?
+  quantity      String?
+  buyerType     String?
+  monthlyVolume String?
+  /// Customer message. Public forms write the same text to notes for the original column.
+  message       String        @default("")
+  notes         String        @default("")
+  isDemo        Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
+
+  items EnquiryItem[]
+
+  @@index([kind, createdAt])
+  @@index([status, createdAt])
+}
+
+model EnquiryItem {
+  id         String  @id @default(cuid())
+  enquiryId  String
+  productId  String?
+  /// Label supplied by the enquirer, retained even if the catalogue product changes.
+  label      String
+  quantity   Decimal @db.Decimal(14, 3)
+  unit       UnitOfMeasure
+
+  enquiry Enquiry  @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([enquiryId])
+  @@index([productId])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  actorId    String
+  action     AuditAction
+  entityType String
+  entityId   String
+  metadata   Json
+  isDemo     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+
+  actor UserProfile @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+}

@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: yusfaith --default;
+}
+
+@plugin "daisyui/theme" {
+  name: "yusfaith";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #f7f4ef;
+  --color-base-200: #efece6;
+  --color-base-300: #e3ded5;
+  --color-base-content: #1c1b19;
+  --color-primary: #e15a12;
+  --color-primary-content: #fff8f3;
+  --color-secondary: #2a2826;
+  --color-secondary-content: #f7f4ef;
+  --color-accent: #8a8175;
+  --color-accent-content: #1c1b19;
+  --color-neutral: #1c1b19;
+  --color-neutral-content: #f7f4ef;
+  --color-info: #243846;
+  --color-info-content: #f4f7f8;
+  --color-success: #1e4d36;
+  --color-success-content: #f3f8f5;
+  --color-warning: #7a4b12;
+  --color-warning-content: #fffbeb;
+  --color-error: #9f2d2d;
+  --color-error-content: #fdf4f4;
+
+  --radius-selector: 0.125rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-manrope);
+  --color-ink: #1c1b19;
+  --color-paper: #f7f4ef;
+  --color-concrete: #e3ded5;
+  --color-line: #d4cec4;
+  --color-brand: #e15a12;
+  --shadow-rest: 0 1px 2px rgb(28 27 25 / 0.06);
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-geist-sans), sans-serif;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  /* DaisyUI sets display:flex on fields, which drops the native textbox role. */
+  .input,
+  .select,
+  .textarea {
+    display: block;
+  }
+}
