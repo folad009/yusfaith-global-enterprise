@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { ProductForm } from "@/components/portal/product-form";
 import { PortalPageHeader } from "@/components/portal/page-header";
 import { AccessState } from "@/components/portal/access-state";
@@ -5,7 +6,15 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { canEditCatalogue } from "@/lib/portal/permissions";
 import { authorizeSection } from "@/server/portal-session";
 
-export default async function NewProductPage() {
+export default function NewProductPage() {
+  return (
+    <Suspense>
+      <NewProduct />
+    </Suspense>
+  );
+}
+
+async function NewProduct() {
   const access = await authorizeSection("products");
   if (access.status !== "ok") {
     return (

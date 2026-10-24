@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { AccessState } from "@/components/portal/access-state";
 import { SalesDocumentForm } from "@/components/portal/sales-document-form";
@@ -11,7 +12,15 @@ import { getOrder } from "@/server/orders";
 import { authorizeSection } from "@/server/portal-session";
 import { listCatalogueProducts } from "@/server/quotes";
 
-export default async function EditOrderPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditOrderPage(props: { params: Promise<{ id: string }> }) {
+  return (
+    <Suspense>
+      <EditOrder {...props} />
+    </Suspense>
+  );
+}
+
+async function EditOrder({ params }: { params: Promise<{ id: string }> }) {
   const access = await authorizeSection("orders");
   if (access.status !== "ok") {
     return (

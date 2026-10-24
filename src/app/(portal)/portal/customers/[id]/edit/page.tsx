@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { AccessState } from "@/components/portal/access-state";
 import { CustomerForm } from "@/components/portal/customer-form";
@@ -8,7 +9,15 @@ import { customerScope } from "@/lib/portal/permissions";
 import { getCustomer } from "@/server/customers";
 import { authorizeSection } from "@/server/portal-session";
 
-export default async function EditCustomerPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditCustomerPage(props: { params: Promise<{ id: string }> }) {
+  return (
+    <Suspense>
+      <EditCustomer {...props} />
+    </Suspense>
+  );
+}
+
+async function EditCustomer({ params }: { params: Promise<{ id: string }> }) {
   const access = await authorizeSection("customers");
   if (access.status !== "ok") {
     return (

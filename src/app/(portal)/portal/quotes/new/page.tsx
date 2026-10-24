@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AccessState } from "@/components/portal/access-state";
 import { SalesDocumentForm } from "@/components/portal/sales-document-form";
 import { PortalPageHeader } from "@/components/portal/page-header";
@@ -8,7 +9,15 @@ import { authorizeSection } from "@/server/portal-session";
 import { createQuote } from "@/server/quote-actions";
 import { listCatalogueProducts } from "@/server/quotes";
 
-export default async function NewQuotePage() {
+export default function NewQuotePage() {
+  return (
+    <Suspense>
+      <NewQuote />
+    </Suspense>
+  );
+}
+
+async function NewQuote() {
   const access = await authorizeSection("quotes");
   if (access.status !== "ok") {
     return (

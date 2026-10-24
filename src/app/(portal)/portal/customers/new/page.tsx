@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AccessState } from "@/components/portal/access-state";
 import { CustomerForm } from "@/components/portal/customer-form";
 import { PortalPageHeader } from "@/components/portal/page-header";
@@ -5,7 +6,15 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { canManageCustomers } from "@/lib/commerce/workflow";
 import { authorizeSection } from "@/server/portal-session";
 
-export default async function NewCustomerPage() {
+export default function NewCustomerPage() {
+  return (
+    <Suspense>
+      <NewCustomer />
+    </Suspense>
+  );
+}
+
+async function NewCustomer() {
   const access = await authorizeSection("customers");
   if (access.status !== "ok") {
     return (

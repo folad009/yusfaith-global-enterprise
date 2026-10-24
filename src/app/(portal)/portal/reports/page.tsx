@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AccessState } from "@/components/portal/access-state";
 import { PortalPageHeader } from "@/components/portal/page-header";
 import { MetricCard } from "@/components/ui/metric-card";
@@ -7,7 +8,15 @@ import { isClerkConfigured } from "@/lib/portal/clerk";
 import { defaultDashboardRange, loadDashboard } from "@/server/dashboard";
 import { authorizeSection } from "@/server/portal-session";
 
-export default async function ReportsPage() {
+export default function ReportsPage() {
+  return (
+    <Suspense>
+      <Reports />
+    </Suspense>
+  );
+}
+
+async function Reports() {
   const access = await authorizeSection("reports");
   if (access.status !== "ok") {
     return (

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { AccessState } from "@/components/portal/access-state";
 import { StockForms } from "@/components/portal/stock-forms";
@@ -12,7 +13,18 @@ const notices: Record<string, string> = {
   adjusted: "Adjustment recorded. The on-hand quantity has been updated.",
 };
 
-export default async function InventoryDetailPage({
+export default function InventoryDetailPage(props: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ notice?: string }>;
+}) {
+  return (
+    <Suspense>
+      <InventoryDetail {...props} />
+    </Suspense>
+  );
+}
+
+async function InventoryDetail({
   params,
   searchParams,
 }: {

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AccessState } from "@/components/portal/access-state";
 import { SalesDocumentForm } from "@/components/portal/sales-document-form";
 import { PortalPageHeader } from "@/components/portal/page-header";
@@ -8,7 +9,15 @@ import { createOrder } from "@/server/order-actions";
 import { authorizeSection } from "@/server/portal-session";
 import { listCatalogueProducts } from "@/server/quotes";
 
-export default async function NewOrderPage() {
+export default function NewOrderPage() {
+  return (
+    <Suspense>
+      <NewOrder />
+    </Suspense>
+  );
+}
+
+async function NewOrder() {
   const access = await authorizeSection("orders");
   if (access.status !== "ok") {
     return (

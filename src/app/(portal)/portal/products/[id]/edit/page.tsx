@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { AccessState } from "@/components/portal/access-state";
 import { ProductForm } from "@/components/portal/product-form";
@@ -7,7 +8,15 @@ import { canEditCatalogue } from "@/lib/portal/permissions";
 import { authorizeSection } from "@/server/portal-session";
 import { getProduct } from "@/server/products";
 
-export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditProductPage(props: { params: Promise<{ id: string }> }) {
+  return (
+    <Suspense>
+      <EditProduct {...props} />
+    </Suspense>
+  );
+}
+
+async function EditProduct({ params }: { params: Promise<{ id: string }> }) {
   const access = await authorizeSection("products");
   if (access.status !== "ok") {
     return (

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { AccessState } from "@/components/portal/access-state";
 import { SalesDocumentForm } from "@/components/portal/sales-document-form";
@@ -10,7 +11,15 @@ import { updateQuote } from "@/server/quote-actions";
 import { customerScope } from "@/lib/portal/permissions";
 import { getQuote, listCatalogueProducts } from "@/server/quotes";
 
-export default async function EditQuotePage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditQuotePage(props: { params: Promise<{ id: string }> }) {
+  return (
+    <Suspense>
+      <EditQuote {...props} />
+    </Suspense>
+  );
+}
+
+async function EditQuote({ params }: { params: Promise<{ id: string }> }) {
   const access = await authorizeSection("quotes");
   if (access.status !== "ok") {
     return (

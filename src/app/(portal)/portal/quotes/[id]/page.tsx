@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AccessState } from "@/components/portal/access-state";
@@ -19,7 +20,18 @@ const notices: Record<string, string> = {
   status: "Quotation status updated.",
 };
 
-export default async function QuoteDetailPage({
+export default function QuoteDetailPage(props: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ notice?: string }>;
+}) {
+  return (
+    <Suspense>
+      <QuoteDetail {...props} />
+    </Suspense>
+  );
+}
+
+async function QuoteDetail({
   params,
   searchParams,
 }: {

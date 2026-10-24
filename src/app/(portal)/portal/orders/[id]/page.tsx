@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AccessState } from "@/components/portal/access-state";
@@ -19,7 +20,18 @@ const notices: Record<string, string> = {
   "from-quote": "Order created from the accepted quotation. It is pending approval.",
 };
 
-export default async function OrderDetailPage({
+export default function OrderDetailPage(props: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ notice?: string }>;
+}) {
+  return (
+    <Suspense>
+      <OrderDetail {...props} />
+    </Suspense>
+  );
+}
+
+async function OrderDetail({
   params,
   searchParams,
 }: {

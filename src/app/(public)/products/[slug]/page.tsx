@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,7 +22,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function ProductDetailPage({ params }: PageProps) {
+export default function ProductDetailPage(props: PageProps) {
+  return (
+    <Suspense>
+      <ProductDetail {...props} />
+    </Suspense>
+  );
+}
+
+async function ProductDetail({ params }: PageProps) {
   const { slug } = await params;
   const product = getProduct(slug);
   if (!product) notFound();

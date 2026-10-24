@@ -9,17 +9,23 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function PortalLayout({ children }: { children: React.ReactNode }) {
-  const actor = await getPortalActor();
+export default function PortalLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-base-200" />}>
-      <PortalShell
-        actor={actor}
-        clerkEnabled={isClerkConfigured()}
-        showRolePreview={process.env.NODE_ENV !== "production" && !isClerkConfigured()}
-      >
-        {children}
-      </PortalShell>
+      <PortalFrame>{children}</PortalFrame>
     </Suspense>
+  );
+}
+
+async function PortalFrame({ children }: { children: React.ReactNode }) {
+  const actor = await getPortalActor();
+  return (
+    <PortalShell
+      actor={actor}
+      clerkEnabled={isClerkConfigured()}
+      showRolePreview={process.env.NODE_ENV !== "production" && !isClerkConfigured()}
+    >
+      {children}
+    </PortalShell>
   );
 }

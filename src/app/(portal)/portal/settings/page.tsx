@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AccessState } from "@/components/portal/access-state";
 import { PortalPageHeader } from "@/components/portal/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -5,7 +6,15 @@ import { getDb } from "@/lib/db";
 import { requireSingleBranch } from "@/server/branch";
 import { authorizeSection } from "@/server/portal-session";
 
-export default async function SettingsPage() {
+export default function SettingsPage() {
+  return (
+    <Suspense>
+      <Settings />
+    </Suspense>
+  );
+}
+
+async function Settings() {
   const access = await authorizeSection("settings");
   if (access.status !== "ok") {
     return (

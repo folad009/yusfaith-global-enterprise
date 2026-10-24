@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,7 +17,18 @@ const notices: Record<string, string> = {
   deactivated: "Product deactivated.",
 };
 
-export default async function ProductDetailPage({
+export default function ProductDetailPage(props: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ notice?: string }>;
+}) {
+  return (
+    <Suspense>
+      <ProductDetail {...props} />
+    </Suspense>
+  );
+}
+
+async function ProductDetail({
   params,
   searchParams,
 }: {
