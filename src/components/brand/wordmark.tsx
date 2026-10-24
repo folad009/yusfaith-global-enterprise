@@ -1,19 +1,24 @@
+import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/cn";
 
 export function Wordmark({
-  tone = "dark",
   href = "/",
+  compact = false,
 }: {
   tone?: "dark" | "light";
   href?: string;
+  compact?: boolean;
 }) {
   return (
-    <Link href={href} className={cn("block leading-none", tone === "light" ? "text-paper" : "text-ink")}>
-      <span className="font-display text-lg font-semibold tracking-[0.18em]">YUSFAITH</span>
-      <span className="mt-1 block text-[10px] tracking-[0.22em] uppercase opacity-70">
-        Global Enterprises
-      </span>
+    <Link href={href} aria-label="YUSFAITH Global Enterprises" className="inline-flex shrink-0">
+      <Image
+        src="/brand/yusfaith-logo.png"
+        alt=""
+        width={751}
+        height={486}
+        priority={!compact}
+        className={compact ? "h-10 w-10 object-cover object-top" : "h-16 w-auto"}
+      />
     </Link>
   );
 }

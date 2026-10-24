@@ -43,6 +43,7 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-manrope);
+  --font-stamp: var(--font-barlow-condensed);
   --color-ink: #1c1b19;
   --color-paper: #f7f4ef;
   --color-concrete: #e3ded5;

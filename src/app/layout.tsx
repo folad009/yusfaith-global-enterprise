@@ -1,6 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import { Geist, Manrope } from "next/font/google";
+import { Barlow_Condensed, Geist, Manrope } from "next/font/google";
 import { siteUrl } from "@/lib/contact";
 import { isClerkConfigured } from "@/lib/portal/clerk";
 import "./globals.css";
@@ -13,6 +13,12 @@ const geistSans = Geist({
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
+});
+
+const stamp = Barlow_Condensed({
+  variable: "--font-barlow-condensed",
+  subsets: ["latin"],
+  weight: ["500", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-theme="yusfaith"
-      className={`${geistSans.variable} ${manrope.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${manrope.variable} ${stamp.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {isClerkConfigured() ? <ClerkProvider afterSignOutUrl="/">{children}</ClerkProvider> : children}

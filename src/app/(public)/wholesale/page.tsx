@@ -31,7 +31,7 @@ export default function WholesalePage() {
       <section className="mx-auto grid max-w-6xl gap-8 px-6 py-16 md:grid-cols-3">
         {points.map((point) => (
           <article key={point.title} className="border-t border-line pt-4">
-            <h2 className="font-display text-2xl text-ink">{point.title}</h2>
+            <h2 className="font-stamp text-3xl font-bold uppercase leading-none text-ink">{point.title}</h2>
             <p className="mt-3 text-sm leading-6 text-base-content/75">{point.body}</p>
           </article>
         ))}

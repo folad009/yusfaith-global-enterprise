@@ -9,7 +9,7 @@ export function SiteFooter() {
   const whatsapp = whatsappHref("Hello YUSFAITH, I would like to ask about building materials.");
 
   return (
-    <footer className="border-t border-line bg-neutral text-neutral-content">
+    <footer className="border-t-4 border-[#e15a12] bg-neutral text-neutral-content">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-4">
         <div className="md:col-span-2">
           <Wordmark tone="light" />

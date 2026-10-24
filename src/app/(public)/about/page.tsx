@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: "YUSFAITH GLOBAL ENTERPRISES supplies cement and building materials to wholesale buyers in Nigeria.",
 };
 
-const heading = "font-display font-extrabold uppercase leading-[0.95] tracking-tight";
-const label = "text-[11px] font-semibold uppercase tracking-[0.28em] text-[#e15a12]";
+const heading = "font-stamp font-extrabold uppercase leading-[0.88] tracking-tight";
+const label = "font-stamp text-sm font-semibold uppercase tracking-[0.28em] text-[#e15a12]";
 
 const team = [
   {
@@ -67,21 +67,23 @@ const testimonies = [
 export default function AboutPage() {
   return (
     <div className="bg-[#e7e5e2] text-[#1c1b19]">
-      <section className="relative flex min-h-[420px] items-center justify-center">
-        <Image
-          src="/images/hero-yard.jpg"
-          alt="Cement pallets staged in an outdoor materials yard"
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
-        <div className="relative px-6 py-20 text-center text-white">
+      <section className="grid min-h-[520px] bg-black lg:grid-cols-12" data-reveal>
+        <div className="relative z-10 flex flex-col justify-end px-6 py-16 text-white sm:px-10 lg:col-span-7 lg:px-14 lg:py-20">
           <p className={label}>About us</p>
-          <h1 className={`${heading} mx-auto mt-4 max-w-4xl text-4xl text-white md:text-6xl`}>
+          <h1 className={`${heading} mt-4 max-w-3xl text-5xl text-white md:text-7xl`}>
             A yard built around wholesale supply.
           </h1>
+        </div>
+        <div className="relative min-h-72 lg:col-span-5 lg:min-h-full">
+          <Image
+            src="/images/hero-yard.jpg"
+            alt="Cement pallets staged in an outdoor materials yard"
+            fill
+            priority
+            className="object-cover"
+            sizes="(min-width: 1024px) 42vw, 100vw"
+          />
+          <span className="absolute top-0 left-0 size-16 bg-[#e15a12]" aria-hidden="true" />
         </div>
       </section>
 
@@ -132,7 +134,7 @@ export default function AboutPage() {
 
       <section className="bg-black text-white" aria-label="The team">
         <div className="mx-auto max-w-6xl px-6 py-16 lg:py-24">
-          <p className={`${label} text-center`}>The team</p>
+          <p className={label}>The team</p>
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {team.map((person) => (
               <li key={person.name} className="bg-white text-[#1c1b19]">
@@ -157,14 +159,14 @@ export default function AboutPage() {
 
       <section className="bg-white" aria-label="Client testimonies">
         <div className="mx-auto max-w-6xl px-6 py-16 lg:py-24">
-          <p className={`${label} text-center`}>Client testimonies</p>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-7 text-[#1c1b19]/75">
+          <p className={label}>Client testimonies</p>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-[#1c1b19]/75">
             Sample quotes until the company supplies approved client testimonies.
           </p>
           <ul className="mt-10 grid gap-4 md:grid-cols-3">
             {testimonies.map((item) => (
               <li key={item.name} className="bg-[#f7f4ef] p-6">
-                <p className="font-display text-6xl leading-none text-[#e15a12]" aria-hidden="true">
+                <p className="font-stamp text-7xl leading-none text-[#e15a12]" aria-hidden="true">
                   “
                 </p>
                 <blockquote className="mt-2 text-sm leading-7 text-[#1c1b19]/80">{item.quote}</blockquote>

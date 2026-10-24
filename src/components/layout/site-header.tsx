@@ -2,45 +2,49 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Wordmark } from "@/components/brand/wordmark";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { ButtonLink } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import { contactEmail, whatsappHref, whatsappNumber } from "@/lib/contact";
 import { publicLinks } from "@/lib/navigation";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export function SiteHeader() {
   const pathname = usePathname();
-  const home = pathname === "/" || pathname === "/about";
+  const showcase = pathname === "/" || pathname === "/about";
   const email = contactEmail();
   const phone = whatsappNumber();
   const whatsapp = whatsappHref("Hello YUSFAITH, I would like to ask about building materials.");
-  const showStrip = home && Boolean(email || (whatsapp && phone));
+  const showStrip = showcase && Boolean(email || (whatsapp && phone));
+  const [settled, setSettled] = useState(false);
 
-  if (!home) {
-    return (
-      <header className="sticky top-0 z-40 border-b border-line bg-paper">
-        <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-between gap-6 px-6">
-          <Wordmark />
-          <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary">
-            {publicLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm text-ink/80 hover:text-ink">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="hidden lg:block">
-            <ButtonLink href="/quote">Request a quote</ButtonLink>
-          </div>
-          <MobileNav />
-        </div>
-      </header>
-    );
-  }
+  useEffect(() => {
+    if (!showcase) {
+      setSettled(false);
+      return;
+    }
+
+    const trigger = ScrollTrigger.create({
+      start: 64,
+      end: 99999,
+      onToggle: (self) => setSettled(self.isActive),
+    });
+    setSettled(window.scrollY > 64);
+
+    return () => trigger.kill();
+  }, [showcase]);
 
   return (
-    <header className="sticky top-0 z-40 bg-white">
+    <header className="sticky top-0 z-40">
       {showStrip ? (
-        <div className="bg-[#e15a12] text-white">
+        <div
+          className="overflow-hidden bg-[#e15a12] text-white transition-[height,opacity] duration-300"
+          style={{ height: settled ? 0 : "2.25rem", opacity: settled ? 0 : 1 }}
+        >
           <div className="mx-auto flex h-9 max-w-6xl items-center justify-center gap-6 px-6 text-xs">
             {email ? <a href={`mailto:${email}`}>{email}</a> : null}
             {whatsapp && phone ? (
@@ -51,15 +55,20 @@ export function SiteHeader() {
           </div>
         </div>
       ) : null}
-      <div className="relative border-b border-[#e4e1dc]">
-        <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-6 px-6">
+      <div
+        className={cn(
+          "border-b",
+          settled || !showcase ? "border-[#1c1b19]/10 bg-[#e7e5e2]" : "border-[#e4e1dc] bg-white",
+        )}
+      >
+        <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-between gap-6 px-6">
           <Wordmark />
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
             {publicLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs font-semibold uppercase tracking-[0.16em] text-[#1c1b19] hover:text-[#e15a12]"
+                className="font-stamp text-sm font-semibold uppercase tracking-[0.16em] text-[#1c1b19] hover:text-[#e15a12]"
               >
                 {link.label}
               </Link>

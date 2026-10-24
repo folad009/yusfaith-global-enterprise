@@ -191,13 +191,7 @@ function SidebarBody({
   return (
     <>
       <div className={cn("border-b border-white/10 py-6", collapsed ? "px-3" : "px-6")}>
-        {collapsed ? (
-          <Link href="/portal" className="block text-center font-display text-sm tracking-[0.14em] text-paper">
-            YF
-          </Link>
-        ) : (
-          <Wordmark tone="light" href="/portal" />
-        )}
+        <Wordmark href="/portal" compact={collapsed} />
       </div>
       <SidebarNav items={items} pathname={pathname} collapsed={collapsed} />
       {collapsed ? null : (

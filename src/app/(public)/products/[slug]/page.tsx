@@ -40,10 +40,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
           className="object-cover"
           sizes="(min-width: 1024px) 50vw, 100vw"
         />
+        <span className="absolute top-0 left-0 size-12 bg-[#e15a12]" aria-hidden="true" />
       </div>
-      <div>
-        <p className="text-xs font-medium uppercase tracking-[0.16em] text-base-content/60">{product.brand}</p>
-        <h1 className="mt-3 font-display text-4xl tracking-tight text-ink md:text-5xl">{product.name}</h1>
+      <div data-reveal>
+        <p className="font-stamp text-sm font-semibold uppercase tracking-[0.22em] text-[#e15a12]">{product.brand}</p>
+        <h1 className="mt-3 font-stamp text-5xl font-extrabold uppercase leading-[0.88] tracking-tight text-ink md:text-6xl">{product.name}</h1>
         <p className="mt-4 text-base leading-7 text-base-content/75">{product.description}</p>
         <dl className="mt-6 grid gap-3 text-sm">
           <div className="flex justify-between gap-4 border-b border-line py-2">

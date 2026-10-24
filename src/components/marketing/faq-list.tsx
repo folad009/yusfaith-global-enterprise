@@ -26,7 +26,7 @@ export function FaqList() {
     <div className="grid gap-3">
       {questions.map((item) => (
         <details key={item.question} className="group bg-white">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-display text-lg font-extrabold uppercase leading-tight tracking-tight text-[#1c1b19] [&::-webkit-details-marker]:hidden">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-stamp text-2xl font-bold uppercase leading-none tracking-tight text-[#1c1b19] [&::-webkit-details-marker]:hidden">
             {item.question}
             <span className="text-xl leading-none font-medium text-[#e15a12] group-open:hidden" aria-hidden="true">
               +
